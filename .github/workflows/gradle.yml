@@ -20,8 +20,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Install Android sdkmanager
+      run: |
+        wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+        sudo unzip -d $ANDROID_HOME android-sdk.zip > /dev/null
     - name: Install NDK
-      run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
+      run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;21.0.6113669"
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
