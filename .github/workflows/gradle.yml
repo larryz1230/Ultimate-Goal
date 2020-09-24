@@ -25,7 +25,7 @@ jobs:
       # uses: android-actions/setup-android@331008df4153b5e63c382f19430e2675252852b7
       uses: android-actions/setup-android@v2.0.1
     - name: Install NDK
-      run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;21.0.6113669"
+      run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;21.0.6113669"
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
