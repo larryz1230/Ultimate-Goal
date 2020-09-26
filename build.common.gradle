@@ -23,6 +23,15 @@ android {
 
     compileSdkVersion 28
 
+        // Configure only for each module that uses Java 8
+        // language features (either in its source code or
+        // through dependencies).
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
+
+
     signingConfigs {
         debug {
             keyAlias 'androiddebugkey'
