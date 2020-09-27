@@ -84,6 +84,5 @@ public class MaxHeapPQ {
         contents.remove(contents.size() - 1);
         bubbleDown(1); // after swap, bubble down
         return smallest.item();
-
     }
 }

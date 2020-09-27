@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Auto.vision.PowerCellDetector;
+import org.firstinspires.ftc.teamcode.Auto.vision.TowerGoalDetector;
 import org.firstinspires.ftc.teamcode.Auto.vision.StackDetector;
 import org.opencv.core.Rect;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -134,11 +134,11 @@ public abstract class Autonomous extends LinearOpMode {
     }
 
     public void findAngle(OpenCvWebcam cam){
-        PowerCellDetector pcd = new PowerCellDetector(telemetry);
+        TowerGoalDetector pcd = new TowerGoalDetector(telemetry);
         webcam.setPipeline(pcd);
-        Rect[] r = pcd.returnBoundRect();
-        telemetry.addData("X: ", r[1].x);
-        telemetry.addData("Y: ", r[1].y);
+        Rect tower_goal = pcd.goal_coor(pcd.sortRects(pcd.returnBoundRect()));
+        telemetry.addData("X: ", tower_goal.x);
+        telemetry.addData("Y: ", tower_goal.y);
         telemetry.update();
 
     }
