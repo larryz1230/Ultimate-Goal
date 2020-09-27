@@ -5,6 +5,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
@@ -12,13 +13,15 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PowerCellDetector extends OpenCvPipeline {
+public class TowerGoalDetector extends OpenCvPipeline {
     final Scalar donut_found = new Scalar(0, 255, 0);
     final Scalar donut_not_found = new Scalar(255, 0, 0);
     private Rect[] boundRect_arr;
     private Telemetry t;
+    private final double pole_ratio = 1;
+    private final double  goal_ratio = 2;
 
-    public PowerCellDetector(Telemetry t){
+    public TowerGoalDetector(Telemetry t){
         t = this.t;
     }
 
@@ -90,5 +93,41 @@ public class PowerCellDetector extends OpenCvPipeline {
         }
         return boundRect_arr;
     }
+
+    private double scoreRects(Rect rect){
+        double rect_ratio = rect.width / rect.height;
+        double score = rect_ratio / pole_ratio;
+        return score;
+    }
+
+    public MaxHeapPQ sortRects(Rect[] rectsFound){
+        MaxHeapPQ mhpq = new MaxHeapPQ();
+        for(Rect rect : rectsFound){
+            mhpq.insert(rect, scoreRects(rect));
+        }
+        return mhpq;
+    }
+
+    public Rect goal_coor(MaxHeapPQ mhpq){
+        Rect best_match = mhpq.poll();
+        Rect second_match;
+        Rect tower_goal = null;
+        for(int i = 0; i < mhpq.size(); i++){
+            second_match = mhpq.poll();
+            tower_goal = new Rect(
+                    new Point(best_match.x, best_match.y),
+                    new Point(second_match.x, second_match.y)
+            );
+            double guess_ratio = tower_goal.width/tower_goal.height;
+            if(guess_ratio/goal_ratio > 0.8){
+                break;
+            }else{
+                continue;
+            }
+        }
+        return tower_goal;
+    }
+
+
 }
 
