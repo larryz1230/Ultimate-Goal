@@ -27,17 +27,8 @@ public class StackDetector extends OpenCvPipeline {
             new Point(150, 30)
     );
 
-    private final Rect secondRect = new Rect(
-            new Point(120, 30),
-            new Point(150, 60)
-    );
-
-    private final Rect thirdRect = new Rect(
-            new Point(120, 60),
-            new Point(150, 90)
-    );
-
-    private final double threshold_value = 0.9;
+    private final double threshold_value_zero = 0.0;
+    private final double threshold_value_four = 0.6;
 
     public StackDetector(Telemetry t){
         t = this.t;
@@ -69,56 +60,35 @@ public class StackDetector extends OpenCvPipeline {
          * We are trying to find the hight of the start stack so I made 3 submatrix stacked on top of each other to measure the hight
          */
         Mat firstSubMat = workingMatrix.submat(firstRect);
-        Mat secondSubMatrix = workingMatrix.submat(secondRect);
-        Mat thirdSubMartix = workingMatrix.submat(thirdRect);
-
-
 
         // Sum of the matix to find where the yello ends
 
         // sumElems creates the sum of every matrix value, val[0] gets the yellow(white) value
         double firstSubMatTotal = Core.sumElems(firstSubMat).val[0];
-        double secondSubMatrixTotal = Core.sumElems(secondSubMatrix).val[0];
-        double thirdSubMartixTotal = Core.sumElems(thirdSubMartix).val[0];
 
         //Get the percentage of yellow in the submatrix
         //255 is the max value of a grayscaled pixel
-        double percentInFSM = firstSubMatTotal/firstRect.area()/255;
-        double percentInSSM = secondSubMatrixTotal/secondRect.area()/255;
-        double percentInTSM = thirdSubMartixTotal/thirdRect.area()/255;
+        double percentInMat = firstSubMatTotal/firstRect.area()/255;
 
         //Compare the color of each submatrix
 
 
-        if(percentInTSM > threshold_value){
-            stackPos = stack_pos.FOUR;
-            Imgproc.rectangle(workingMatrix, firstRect, donut_found);
-            Imgproc.rectangle(workingMatrix, secondRect, donut_found);
-            Imgproc.rectangle(workingMatrix, thirdRect, donut_found);
-        }else if(percentInFSM > percentInSSM){
+        if(percentInMat > threshold_value_zero && percentInMat < threshold_value_four){
             stackPos = stack_pos.ONE;
             Imgproc.rectangle(workingMatrix, firstRect, donut_found);
-            Imgproc.rectangle(workingMatrix, secondRect, donut_not_found);
-            Imgproc.rectangle(workingMatrix, thirdRect, donut_not_found);
+        }else if(percentInMat >= threshold_value_four){
+            stackPos = stack_pos.FOUR;
+            Imgproc.rectangle(workingMatrix, firstRect, donut_found);
         }else{
             stackPos = stack_pos.NONE;
             Imgproc.rectangle(workingMatrix, firstRect, donut_not_found);
-            Imgproc.rectangle(workingMatrix, secondRect, donut_not_found);
-            Imgproc.rectangle(workingMatrix, thirdRect, donut_not_found);
         }
-        t.addData("Top raw value: ", firstSubMatTotal);
-        t.addData("Middle raw value: ", secondSubMatrixTotal);
-        t.addData("Bottom raw value: ", thirdSubMartixTotal);
-        t.addData("Top percentage: ", percentInFSM + "%");
-        t.addData("Middle percentage: ", percentInSSM + "%");
-        t.addData("Bottom percentage: ", percentInTSM + "%");
+        t.addData("Raw value: ", firstSubMatTotal);
+        t.addData("Top percentage: ", percentInMat + "%");
         t.addData("Stack postion: ", stackPos);
         t.update();
 
         firstSubMat.release();
-        secondSubMatrix.release();
-        thirdSubMartix.release();
-
         // OpenCV returns an image with the matrix on it
         return workingMatrix;
     }
