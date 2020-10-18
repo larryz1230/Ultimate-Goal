@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -9,8 +10,13 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class StackDetector extends OpenCvPipeline {
+  private Telemetry t;
   public enum stack_pos {
     NONE, ONE, FOUR,
+  }
+
+  public StackDetector(Telemetry t){
+      t = this.t;
   }
 
   private stack_pos stackPos = stack_pos.NONE;
