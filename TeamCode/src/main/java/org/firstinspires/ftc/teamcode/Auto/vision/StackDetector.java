@@ -22,6 +22,8 @@ public class StackDetector extends OpenCvPipeline {
     private Mat workingMatrix = new Mat();
     private stack_pos stackPos = stack_pos.NONE;
     private Telemetry t;
+    //FoV 60 degrees
+    //1280 x 720
     private final Rect firstRect = new Rect(
             new Point(120, 0),
             new Point(150, 30)

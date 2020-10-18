@@ -122,6 +122,7 @@ public class TowerGoalDetector extends OpenCvPipeline {
             if(guess_ratio/goal_ratio > 0.8){
                 break;
             }else{
+                tower_goal = null;
                 continue;
             }
         }
