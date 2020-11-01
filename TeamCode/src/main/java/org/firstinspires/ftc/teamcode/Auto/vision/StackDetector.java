@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auto.vision;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -8,92 +7,112 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-/* This is the pipeline
- * A pipeline takes the video frame from the camera, and processes the frames
- * Then it returns an image that can be displayed on the robot controller's screen
- * You can also add rectangles to the image sent to the robot controller
- */
-
-enum stack_pos{
-    NONE, ONE, FOUR,
-}
 
 public class StackDetector extends OpenCvPipeline {
-    private Mat workingMatrix = new Mat();
-    private stack_pos stackPos = stack_pos.NONE;
-    private Telemetry t;
-    private final Rect firstRect = new Rect(
-            new Point(120, 0),
-            new Point(150, 30)
-    );
+  public enum stack_pos
+  {
+    NONE, ONE, FOUR,
+  }
 
-    private final double threshold_value_zero = 0.0;
-    private final double threshold_value_four = 0.6;
+  private stack_pos stackPos = stack_pos.NONE;
 
-    public StackDetector(Telemetry t){
-        t = this.t;
+  double pass = 0.25;
+
+
+  private final Scalar defualt = new Scalar(50, 50, 50);
+  private final Scalar one = new Scalar(255, 0, 0); // Red
+  private final Scalar four = new Scalar(0, 255, 0); //Green
+  private final Scalar zero = new Scalar(0, 0, 255); // Blue
+
+  //    Scalar lowHSV = new Scalar(21, 53, 31); //Hue, Saturation, Values
+//    Scalar highHSV = new Scalar(46, 96, 91);
+  Scalar lowHSV = new Scalar(10, 130, 85); //Hue, Saturation, Values
+  Scalar highHSV = new Scalar(180, 255, 255);
+
+//    private final Rect secondRect = new Rect(
+//            new Point(240, 225),
+//            new Point(320, 245)
+//    );
+//
+//    private final Rect firstRect = new Rect(
+//            new Point(240, 245),
+//            new Point(320, 275)
+//    );
+
+  private final Rect secondRect = new Rect(
+          new Point(100, 200),
+          new Point(180, 230)
+  );
+
+  private final Rect firstRect = new Rect(
+          new Point(100, 230),
+          new Point(180, 260)
+  );
+
+  Mat region1_Cb, region2_Cb;
+  Mat threshHolded = new Mat();
+  double percentage_top, percentage_bottom;
+
+  private volatile stack_pos position = stack_pos.NONE;
+
+
+  void ThreshHolding(Mat input){
+    Imgproc.cvtColor(input, threshHolded, Imgproc.COLOR_BGR2HSV);
+    Core.inRange(threshHolded, lowHSV, highHSV, threshHolded);
+  }
+
+
+  @Override
+  public void init(Mat firstFrame)
+  {
+//        inputToCb(firstFrame);
+    ThreshHolding(firstFrame);
+
+    region1_Cb = threshHolded.submat(secondRect);
+    region2_Cb = threshHolded.submat(firstRect);
+  }
+
+  @Override
+  public Mat processFrame(Mat input)
+  {
+    ThreshHolding(input);
+
+    region1_Cb = threshHolded.submat(secondRect);
+    region2_Cb = threshHolded.submat(firstRect);
+
+    percentage_top = Core.sumElems(region1_Cb).val[0] / secondRect.area() / 255;
+    percentage_bottom = Core.sumElems(region2_Cb).val[0] / firstRect.area() / 255;
+
+    Imgproc.rectangle(threshHolded, secondRect, defualt, 3);
+    Imgproc.rectangle(threshHolded, firstRect, defualt, 3);
+
+    if(round(percentage_top) < pass && round(percentage_bottom) > pass){
+      stackPos = stack_pos.ONE;
+      Imgproc.rectangle(input, firstRect, one, 1);
+      Imgproc.rectangle(input, secondRect, defualt, 1);
+    }else if(round(percentage_top) > pass && round(percentage_bottom) > pass){
+      stackPos = stack_pos.FOUR;
+      Imgproc.rectangle(input, firstRect, four, 1);
+      Imgproc.rectangle(input, secondRect, four, 1);
+    }else{
+      stackPos = stack_pos.NONE;
+      Imgproc.rectangle(input, firstRect, zero, 1);
+      Imgproc.rectangle(input, secondRect, zero, 1);
     }
 
-    private final Scalar donut_found = new Scalar(0, 255, 0);
-    private final Scalar donut_not_found = new Scalar(255, 0, 0);
+    System.out.println("Stack is: " + stackPos);
+    System.out.println("Percentage Top: " + round(percentage_top));
+    System.out.println("Percentage Bottom: " + round(percentage_bottom));
 
-    @Override
-    // A matix of pixels (the picture the camera takes)
-    public final Mat processFrame(Mat input){
-        input.copyTo(workingMatrix);
+    return input;
+  }
 
-        if(workingMatrix.empty()){
-            return input;
-        }
+  public stack_pos getAnalysis()
+  {
+    return position;
+  }
 
-        Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_RGB2HSV); //Looking for a color range
-        //Define the range of colors we are looking for
-        Scalar lowHSV = new Scalar(62, 32, 100); //Hue, Saturation, Values
-        Scalar highHSV = new Scalar(54, 100, 29);
-
-        //Thresholding the image, only show yellow and nothing else (Grayscaled)
-        Core.inRange(workingMatrix, lowHSV, highHSV, workingMatrix);
-
-        /* Create a submatrix
-         * These are not the real numbers, need to find real numbers later
-         * (rowStart, rowEnd, colStart, colEnd) creates a square
-         * We are trying to find the hight of the start stack so I made 3 submatrix stacked on top of each other to measure the hight
-         */
-        Mat firstSubMat = workingMatrix.submat(firstRect);
-
-        // Sum of the matix to find where the yello ends
-
-        // sumElems creates the sum of every matrix value, val[0] gets the yellow(white) value
-        double firstSubMatTotal = Core.sumElems(firstSubMat).val[0];
-
-        //Get the percentage of yellow in the submatrix
-        //255 is the max value of a grayscaled pixel
-        double percentInMat = firstSubMatTotal/firstRect.area()/255;
-
-        //Compare the color of each submatrix
-
-
-        if(percentInMat > threshold_value_zero && percentInMat < threshold_value_four){
-            stackPos = stack_pos.ONE;
-            Imgproc.rectangle(workingMatrix, firstRect, donut_found);
-        }else if(percentInMat >= threshold_value_four){
-            stackPos = stack_pos.FOUR;
-            Imgproc.rectangle(workingMatrix, firstRect, donut_found);
-        }else{
-            stackPos = stack_pos.NONE;
-            Imgproc.rectangle(workingMatrix, firstRect, donut_not_found);
-        }
-        t.addData("Raw value: ", firstSubMatTotal);
-        t.addData("Top percentage: ", percentInMat + "%");
-        t.addData("Stack postion: ", stackPos);
-        t.update();
-
-        firstSubMat.release();
-        // OpenCV returns an image with the matrix on it
-        return workingMatrix;
-    }
-
-    public stack_pos getStackPos(){
-        return stackPos;
-    }
+  public static double round(double x){
+    return (double)Math.round(x * 1000d) / 1000d;
+  }
 }
