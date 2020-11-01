@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auto.vision;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -10,32 +9,45 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class StackDetector extends OpenCvPipeline {
-  private Telemetry t;
-  public enum stack_pos {
+  public enum stack_pos
+  {
     NONE, ONE, FOUR,
-  }
-
-  public StackDetector(Telemetry t){
-      t = this.t;
   }
 
   private stack_pos stackPos = stack_pos.NONE;
 
   double pass = 0.25;
 
+
   private final Scalar defualt = new Scalar(50, 50, 50);
   private final Scalar one = new Scalar(255, 0, 0); // Red
-  private final Scalar four = new Scalar(0, 255, 0); // Green
+  private final Scalar four = new Scalar(0, 255, 0); //Green
   private final Scalar zero = new Scalar(0, 0, 255); // Blue
 
-  // Scalar lowHSV = new Scalar(21, 53, 31); //Hue, Saturation, Values
-  // Scalar highHSV = new Scalar(46, 96, 91);
-  Scalar lowHSV = new Scalar(10, 130, 85); // Hue, Saturation, Values
+  //    Scalar lowHSV = new Scalar(21, 53, 31); //Hue, Saturation, Values
+//    Scalar highHSV = new Scalar(46, 96, 91);
+  Scalar lowHSV = new Scalar(10, 130, 85); //Hue, Saturation, Values
   Scalar highHSV = new Scalar(180, 255, 255);
 
-  private final Rect secondRect = new Rect(new Point(240, 225), new Point(320, 245));
+//    private final Rect secondRect = new Rect(
+//            new Point(240, 225),
+//            new Point(320, 245)
+//    );
+//
+//    private final Rect firstRect = new Rect(
+//            new Point(240, 245),
+//            new Point(320, 275)
+//    );
 
-  private final Rect firstRect = new Rect(new Point(240, 245), new Point(320, 275));
+  private final Rect secondRect = new Rect(
+          new Point(100, 200),
+          new Point(180, 230)
+  );
+
+  private final Rect firstRect = new Rect(
+          new Point(100, 230),
+          new Point(180, 260)
+  );
 
   Mat region1_Cb, region2_Cb;
   Mat threshHolded = new Mat();
@@ -43,14 +55,17 @@ public class StackDetector extends OpenCvPipeline {
 
   private volatile stack_pos position = stack_pos.NONE;
 
-  void ThreshHolding(Mat input) {
+
+  void ThreshHolding(Mat input){
     Imgproc.cvtColor(input, threshHolded, Imgproc.COLOR_BGR2HSV);
     Core.inRange(threshHolded, lowHSV, highHSV, threshHolded);
   }
 
+
   @Override
-  public void init(Mat firstFrame) {
-    // inputToCb(firstFrame);
+  public void init(Mat firstFrame)
+  {
+//        inputToCb(firstFrame);
     ThreshHolding(firstFrame);
 
     region1_Cb = threshHolded.submat(secondRect);
@@ -58,7 +73,8 @@ public class StackDetector extends OpenCvPipeline {
   }
 
   @Override
-  public Mat processFrame(Mat input) {
+  public Mat processFrame(Mat input)
+  {
     ThreshHolding(input);
 
     region1_Cb = threshHolded.submat(secondRect);
@@ -70,15 +86,15 @@ public class StackDetector extends OpenCvPipeline {
     Imgproc.rectangle(threshHolded, secondRect, defualt, 3);
     Imgproc.rectangle(threshHolded, firstRect, defualt, 3);
 
-    if (round(percentage_top) < pass && round(percentage_bottom) > pass) {
+    if(round(percentage_top) < pass && round(percentage_bottom) > pass){
       stackPos = stack_pos.ONE;
       Imgproc.rectangle(input, firstRect, one, 1);
       Imgproc.rectangle(input, secondRect, defualt, 1);
-    } else if (round(percentage_top) > pass && round(percentage_bottom) > pass) {
+    }else if(round(percentage_top) > pass && round(percentage_bottom) > pass){
       stackPos = stack_pos.FOUR;
       Imgproc.rectangle(input, firstRect, four, 1);
       Imgproc.rectangle(input, secondRect, four, 1);
-    } else {
+    }else{
       stackPos = stack_pos.NONE;
       Imgproc.rectangle(input, firstRect, zero, 1);
       Imgproc.rectangle(input, secondRect, zero, 1);
@@ -91,11 +107,12 @@ public class StackDetector extends OpenCvPipeline {
     return input;
   }
 
-  public stack_pos getAnalysis() {
+  public stack_pos getAnalysis()
+  {
     return position;
   }
 
-  public static double round(double x) {
-    return (double) Math.round(x * 1000d) / 1000d;
+  public static double round(double x){
+    return (double)Math.round(x * 1000d) / 1000d;
   }
 }
