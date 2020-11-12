@@ -1,61 +1,95 @@
 package org.firstinspires.ftc.teamcode.Auto.vision;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class TowerGoalDetector extends OpenCvPipeline {
-    final Scalar donut_found = new Scalar(0, 255, 0);
-    final Scalar donut_not_found = new Scalar(255, 0, 0);
-    private Rect[] boundRect_arr;
-    private Telemetry t;
-    private final double pole_ratio = 1;
-    private final double  goal_ratio = 2;
+    Scalar redLowHSV = new Scalar(0, 72, 170); //Hue, Saturation, Values
+    Scalar blueLowHSV = new Scalar(114, 45, 47); //Hue, Saturation, Values
+    Scalar redHighHSV = new Scalar(180, 255, 255);
+    Scalar blueHighHSV = new Scalar(143, 201, 144);
 
-    public TowerGoalDetector(Telemetry t){
-        t = this.t;
+    Mat threshHoldedBlue = new Mat();
+    Mat threshHoldedRed = new Mat();
+
+    void ThreshHoldingRed(Mat input, Mat output) {
+        Imgproc.blur(input, output, new Size(9, 9));
+        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2HSV);
+        Core.inRange(output, redLowHSV, redHighHSV, threshHoldedRed);
+    }
+
+    void ThreshHoldingBlue(Mat input, Mat output) {
+        Imgproc.blur(input, output, new Size(9, 9));
+        Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2HSV);
+        Core.inRange(output, blueLowHSV, blueHighHSV, threshHoldedBlue);
     }
 
     @Override
-    // A matix of pixels (the picture the camera takes)
-    public final Mat processFrame(Mat input){
-        Mat workingMatrix = new Mat();
-        //Holds the grayscaled image
-        Mat grayScaled = new Mat();
-
-
-        input.copyTo(workingMatrix);
-
-        if(workingMatrix.empty()){
-            return input;
-        }
-
-        Imgproc.medianBlur(workingMatrix, workingMatrix, 3); //No background noise
-        Imgproc.cvtColor(workingMatrix, workingMatrix, Imgproc.COLOR_RGB2HSV); //Looking for a color range
-        //Define the range of colors we are looking for
-        Scalar lowHSV = new Scalar(62, 32, 100); //Hue, Saturation, Values
-        Scalar highHSV = new Scalar(54, 100, 29);
-
-        //Thresholding the image, only show yellow and nothing else (Grayscaled)
-        Core.inRange(workingMatrix, lowHSV, highHSV, workingMatrix);
-        boundRect_arr = getBoundingRect(workingMatrix);
-
-        return workingMatrix;
+    public void init(Mat firstFrame) {
+        ThreshHoldingRed(firstFrame, threshHoldedRed);
     }
 
-    private Rect[] getBoundingRect(Mat workingMatrix){
-        Mat hierarchy = new Mat();
+    /*
+    - First threshold to find the largest blue or red
+    - Limit vision to that slice of image
+    - Next find the red / blue poles
+    - Create a bounding rect around the extreme points from step 3
+     */
+    @Override
+    // A matix of pixels (the picture the camera takes)
+    public final Mat processFrame(Mat input) {
+        if (input.empty()) return input;
+
+        ThreshHoldingRed(input, threshHoldedRed);
+        Rect big_rect = getBigSquare(threshHoldedRed, input);
+        Rect slice = getSlice(threshHoldedRed, input, big_rect);
+        ThreshHoldingBlue(input, threshHoldedBlue);
+        Rect[] rect_arr_blue = getBoundingRect(threshHoldedBlue, input, slice);
+        getCenter(input, rect_arr_blue);
+
+        return input;
+    }
+
+    private Rect getBigSquare(Mat workingMatrix, Mat output) {
         List<MatOfPoint> contours = new ArrayList<>(); //List of contours stored as a list of points
-        Imgproc.findContours(workingMatrix, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(workingMatrix, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Rect[] boundRect_arr = new Rect[contours.size()]; // Store the boundRect
+
+        // Get the shapes
+        for (int i = 0; i < contours.size(); i++) {
+            boundRect_arr[i] = Imgproc.boundingRect(new MatOfPoint(contours.get(i)));
+        }
+
+        Rect max = boundRect_arr[0];
+        for (int i = 0; i < boundRect_arr.length; i++) {
+            if (boundRect_arr[i].area() > max.area()) {
+                max = boundRect_arr[i];
+            }
+        }
+
+        Imgproc.rectangle(output, max.tl(), max.br(), new Scalar(0, 204, 0));
+        return max;
+    }
+
+    private Rect getSlice(Mat workingMatrix, Mat output, Rect bigRect) {
+        Rect slice = new Rect(
+                new Point(bigRect.tl().x - 20, 0),
+                new Point(bigRect.br().x + 20, workingMatrix.height())
+        );
+
+        Imgproc.rectangle(output, slice.tl(), slice.br(), new Scalar(255, 255, 102));
+        return slice;
+    }
+
+    private Rect[] getBoundingRect(Mat workingMatrix, Mat output, Rect slice) {
+        List<MatOfPoint> contours = new ArrayList<>(); //List of contours stored as a list of points
+        //Mat slice_region = workingMatrix.submat(slice); // Coordinates are not specific to the slice region
+        Imgproc.findContours(workingMatrix, contours, new Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
         /*
             workingMatrix: Binary image
             contours: List of detected contours
@@ -64,71 +98,39 @@ public class TowerGoalDetector extends OpenCvPipeline {
             CHAIN_APPROX_SIMPLE: The method, compresses horizontal, vertical, and diagonal segments and leaves on;y their end points (simplify the shape)
          */
 
-        MatOfPoint2f[] contoursPoly = new MatOfPoint2f[contours.size()]; //A 2D array that wholes the contour points
         Rect[] boundRect_arr = new Rect[contours.size()]; // Store the boundRect
-
         // Get the shapes
-        for(int i = 0; i < contours.size(); i++){
-            contoursPoly[i] = new MatOfPoint2f();
-            boundRect_arr[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
+        for (int i = 0; i < contours.size(); i++) {
+            boundRect_arr[i] = Imgproc.boundingRect(new MatOfPoint(contours.get(i)));
         }
 
-        List<MatOfPoint> contoursPolyList = new ArrayList<> (contoursPoly.length); // All the input contours, each contour is a vector of points
-        for(MatOfPoint2f poly : contoursPoly){
-            contoursPolyList.add(new MatOfPoint(poly.toArray()));
-        }
-
-        for(int i = 0; i < contours.size(); i++){
-            Imgproc.drawContours(workingMatrix, contoursPolyList, i, donut_not_found); //The 'i' is the contourldx, can be any number other an negative
-            Imgproc.rectangle(workingMatrix, boundRect_arr[i].tl(), boundRect_arr[i].br(), donut_not_found);
+        for (int i = 0; i < contours.size(); i++) {
+            Imgproc.rectangle(output, boundRect_arr[i].tl(), boundRect_arr[i].br(), new Scalar(0, 0, 255));
         }
         return boundRect_arr;
     }
 
-    public Rect[] returnBoundRect(){
-        if(boundRect_arr == null) {
-            t.addData("boundRect not found", 0);
-            t.update();
-            System.exit(1);
-        }
-        return boundRect_arr;
-    }
+    private Point getCenter(Mat output, Rect[] boundRect_arr) {
+        // Get tl
+        Point max_tl = boundRect_arr[0].tl();
+        Point max_br = boundRect_arr[0].br();
 
-    private double scoreRects(Rect rect){
-        double rect_ratio = rect.width / rect.height;
-        double score = rect_ratio / pole_ratio;
-        return score;
-    }
-
-    public MaxHeapPQ sortRects(Rect[] rectsFound){
-        MaxHeapPQ mhpq = new MaxHeapPQ();
-        for(Rect rect : rectsFound){
-            mhpq.insert(rect, scoreRects(rect));
-        }
-        return mhpq;
-    }
-
-    public Rect goal_coor(MaxHeapPQ mhpq){
-        Rect best_match = mhpq.poll();
-        Rect second_match;
-        Rect tower_goal = null;
-        for(int i = 0; i < mhpq.size(); i++){
-            second_match = mhpq.poll();
-            tower_goal = new Rect(
-                    new Point(best_match.x, best_match.y),
-                    new Point(second_match.x, second_match.y)
-            );
-            double guess_ratio = tower_goal.width/tower_goal.height;
-            if(guess_ratio/goal_ratio > 0.8){
-                break;
-            }else{
-                tower_goal = null;
-                continue;
+        for (Rect rect : boundRect_arr) {
+            if (rect.tl().x < max_tl.x) {
+                max_tl = rect.tl();
             }
         }
-        return tower_goal;
+
+        for (Rect rect : boundRect_arr) {
+            if (rect.br().y > max_br.y) {
+                max_br = rect.br();
+            }
+        }
+
+        Rect boundRect = new Rect(max_tl, max_br);
+        Point center = new Point((boundRect.tl().x + boundRect.br().x) * 0.5, (boundRect.tl().y + boundRect.br().y) * 0.5);
+        Imgproc.circle(output, center, 4, new Scalar(0, 0, 255));
+        return new Point((boundRect.tl().x + boundRect.br().x) * 0.5, (boundRect.tl().y + boundRect.br().y) * 0.5);
     }
-
-
 }
 

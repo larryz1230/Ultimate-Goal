@@ -39,4 +39,5 @@ public abstract class CommandBase implements Command {
     m_subsystem = subsystem;
   }
 
+    public abstract void initialize();
 }

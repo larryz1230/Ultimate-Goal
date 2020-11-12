@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auto;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -113,7 +114,7 @@ public abstract class Autonomous extends LinearOpMode {
                 .getInstance()
                 .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         webcam.openCameraDevice();
-        StackDetector detector = new StackDetector(telemetry);
+        StackDetector detector = new StackDetector();
         webcam.setPipeline(detector); // Adding detector to camera stream
         webcam.openCameraDeviceAsync(
                 () -> webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
@@ -129,18 +130,13 @@ public abstract class Autonomous extends LinearOpMode {
         //move motors here
         //comment
         donut_detector();
-        initHardware();
+        //initHardware();
         double motorPower = 0;
     }
 
     public void findAngle(OpenCvWebcam cam){
-        TowerGoalDetector pcd = new TowerGoalDetector(telemetry);
+        TowerGoalDetector pcd = new TowerGoalDetector();
         webcam.setPipeline(pcd);
-        Rect tower_goal = pcd.goal_coor(pcd.sortRects(pcd.returnBoundRect()));
-        telemetry.addData("X: ", tower_goal.x);
-        telemetry.addData("Y: ", tower_goal.y);
-        telemetry.update();
-
     }
 
 }
