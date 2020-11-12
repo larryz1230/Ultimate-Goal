@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
+
+import org.firstinspires.ftc.teamcode.subsystems.MotorSubsystem;
 
 
 public class SetPower extends CommandBase {
