@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.commands.SetPower;
 import org.firstinspires.ftc.teamcode.subsystems.MotorSubsystem;
 
 @TeleOp
-public class teleOp extends CommandOpMode {
+public class testMotor extends CommandOpMode {
     private MotorSubsystem shooter;
     private MotorSubsystem passthrough;
 
