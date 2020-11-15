@@ -1,16 +1,15 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.auto;
 
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Auto.vision.TowerGoalDetector;
-import org.firstinspires.ftc.teamcode.Auto.vision.StackDetector;
-import org.opencv.core.Rect;
+import org.firstinspires.ftc.teamcode.vision.TowerGoalDetector;
+import org.firstinspires.ftc.teamcode.vision.StackDetector;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Test Vision / bad PID")
@@ -105,7 +104,7 @@ public abstract class Autonomous extends LinearOpMode {
         rearEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void donut_detector(){
+    public void useVision(OpenCvPipeline pipeline){
         int cameraMonitorViewId = hardwareMap
                 .appContext
                 .getResources()
@@ -114,8 +113,7 @@ public abstract class Autonomous extends LinearOpMode {
                 .getInstance()
                 .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         webcam.openCameraDevice();
-        StackDetector detector = new StackDetector();
-        webcam.setPipeline(detector); // Adding detector to camera stream
+        webcam.setPipeline(pipeline); // Adding detector to camera stream
         webcam.openCameraDeviceAsync(
                 () -> webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
         );
@@ -126,17 +124,10 @@ public abstract class Autonomous extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //Call the thread for calculating odom
-        //move motors here
-        //comment
-        donut_detector();
-        //initHardware();
-        double motorPower = 0;
+        initHardware();
+        StackDetector stackDetector = new StackDetector();
+        useVision(stackDetector);
+        TowerGoalDetector towerDetector = new TowerGoalDetector();
+        useVision(towerDetector);
     }
-
-    public void findAngle(OpenCvWebcam cam){
-        TowerGoalDetector pcd = new TowerGoalDetector();
-        webcam.setPipeline(pcd);
-    }
-
 }

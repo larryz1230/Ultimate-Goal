@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auto.vision;
+package org.firstinspires.ftc.teamcode.vision;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
