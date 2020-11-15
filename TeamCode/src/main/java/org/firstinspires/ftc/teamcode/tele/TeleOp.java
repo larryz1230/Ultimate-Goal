@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.teamcode.commands.DefualtDrive;
@@ -17,10 +18,10 @@ public class TeleOp extends CommandOpMode {
 
     @Override
     public void initialize() {
-        m_frontLeft = new MotorEx(hardwareMap, "frontLeft");
-        m_frontRight = new MotorEx(hardwareMap, "frontRight");
-        m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft");
-        m_bottomRight = new MotorEx(hardwareMap, "bottomRight");
+        m_frontLeft = new MotorEx(hardwareMap, "frontLeft", Motor.GoBILDA.RPM_435);
+        m_frontRight = new MotorEx(hardwareMap, "frontRight", Motor.GoBILDA.RPM_435);
+        m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft", Motor.GoBILDA.RPM_435);
+        m_bottomRight = new MotorEx(hardwareMap, "bottomRight", Motor.GoBILDA.RPM_435);
         driveSubsys = new DriveSubsystem(
                 m_frontLeft,
                 m_frontRight,
@@ -32,9 +33,8 @@ public class TeleOp extends CommandOpMode {
         driveCommand = new DefualtDrive(
                 driveSubsys,
                 () -> driverController.getLeftX(),
-                () -> driverController.getLeftY(),
-                () -> hardwareMap.gyroSensor.get("BNO055IMU").getRotationFraction()
-        );
+                () -> driverController.getLeftY()
+    );
 
         driveSubsys.setDefaultCommand(driveCommand);
         register(driveSubsys);
