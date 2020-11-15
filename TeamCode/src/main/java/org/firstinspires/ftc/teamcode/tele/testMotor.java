@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Tele;
+package org.firstinspires.ftc.teamcode.tele;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;

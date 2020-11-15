@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auto.trajectory;
+package org.firstinspires.ftc.teamcode.auto.trajectory;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
