@@ -21,10 +21,20 @@ public class TeleOp extends CommandOpMode {
         m_frontRight = new MotorEx(hardwareMap, "frontRight");
         m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft");
         m_bottomRight = new MotorEx(hardwareMap, "bottomRight");
-        m_drive = new DriveSubsystem(m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight);
+        m_drive = new DriveSubsystem(
+                m_frontLeft,
+                m_frontRight,
+                m_bottomLeft,
+                m_bottomRight
+        );
 
         m_driveOp = new GamepadEx(gamepad1);
-        m_driveCommand = new DefualtDrive(m_drive, m_driveOp.getLeftX(), m_driveOp.getLeftY(), hardwareMap.gyroSensor.get("BNO055IMU").getRotationFraction()); //How to get tSpeed and gyroAngle
+        m_driveCommand = new DefualtDrive(
+                m_drive,
+                () -> m_driveOp.getLeftX(),
+                () -> m_driveOp.getLeftY(),
+                () -> hardwareMap.gyroSensor.get("BNO055IMU").getRotationFraction()
+        );
 
         m_drive.setDefaultCommand(m_driveCommand);
         register(m_drive);
