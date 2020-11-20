@@ -11,7 +11,7 @@ public class DefualtDrive extends CommandBase {
     private final DoubleSupplier m_hSpeed;
     private final DoubleSupplier m_vSpeed;
     private final DoubleSupplier m_tSpeed;
-    private final DoubleSupplier m_gyroAngle;
+//    private final DoubleSupplier m_gyroAngle;
 //    private final double m_hSpeed;
 //    private final double m_vSpeed;
 //    private final double m_gyroAngle;
@@ -21,7 +21,16 @@ public class DefualtDrive extends CommandBase {
         this.m_hSpeed = hSpeed;
         this.m_vSpeed = vSpeed;
         this.m_tSpeed = tSpeed;
-        this.m_gyroAngle = gyro;
+ //       this.m_gyroAngle = gyro;
+        addRequirements(this.m_drive);
+    }
+
+
+    public DefualtDrive(DriveSubsystem subsystem, DoubleSupplier hSpeed, DoubleSupplier vSpeed, DoubleSupplier tSpeed) {
+        this.m_drive = subsystem;
+        this.m_hSpeed = hSpeed;
+        this.m_vSpeed = vSpeed;
+        this.m_tSpeed = tSpeed;
         addRequirements(this.m_drive);
     }
 
@@ -30,8 +39,8 @@ public class DefualtDrive extends CommandBase {
         m_drive.drive(
                 this.m_hSpeed.getAsDouble(),
                 this.m_vSpeed.getAsDouble(),
-                this.m_tSpeed.getAsDouble(),
-                this.m_gyroAngle.getAsDouble()
+                this.m_tSpeed.getAsDouble()
+//                this.m_gyroAngle.getAsDouble()
         );
     }
 }

@@ -43,8 +43,8 @@ public class testDrive extends CommandOpMode {
                 driveSubsys,
                 () -> driverController.getLeftX(),
                 () -> driverController.getLeftY(),
-                () -> driverController.getRightX(),
-                () -> gyro.getHeading()
+                () -> driverController.getRightX()
+//                () -> gyro.getHeading()
         );
 
 
