@@ -3,12 +3,9 @@ package org.firstinspires.ftc.teamcode.tele;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.GyroSensor;
 
 import org.firstinspires.ftc.teamcode.commands.DefualtDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -43,8 +40,8 @@ public class testDrive extends CommandOpMode {
                 driveSubsys,
                 () -> driverController.getLeftX(),
                 () -> driverController.getLeftY(),
-                () -> driverController.getRightX()
-//                () -> gyro.getHeading()
+                () -> driverController.getRightX(),
+                () -> gyro.getHeading()
         );
 
 
