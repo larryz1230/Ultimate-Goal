@@ -41,11 +41,15 @@ public class DriveSubsystem extends SubsystemBase {
                 tSpeed,
                 gyroAngle
         );
-//        m_drive.driveRobotCentric(
-//                hSpeed,
-//                vSpeed,
-//                tSpeed
-//        );
+
+    }
+
+    public void drive(double hSpeed, double vSpeed, double tSpeed){
+        m_drive.driveRobotCentric(
+                hSpeed,
+                vSpeed,
+                tSpeed
+        );
     }
 
 }
