@@ -21,22 +21,17 @@ import java.time.Instant;
 
 @TeleOp
 public class testMotor extends CommandOpMode {
-    private BevelShooterSubsystem shooter;
-    private SetShootPower shootCommand;
+  private BevelShooterSubsystem shooter;
+  private SetShootPower shootCommand;
 
-    @Override
-    public void initialize() {
-        shooter = new BevelShooterSubsystem(new MotorEx(hardwareMap, "motor"), new MotorEx(hardwareMap, "inverted"));
+  @Override
+  public void initialize() {
+    shooter = new BevelShooterSubsystem(new MotorEx(hardwareMap, "motor"), new MotorEx(hardwareMap, "inverted"));
 
-        GamepadEx driverOp = new GamepadEx(gamepad1);
-        shootCommand = new SetShootPower(
-                shooter,
-                driverOp::getLeftY
-        );
+    GamepadEx driverOp = new GamepadEx(gamepad1);
+    shootCommand = new SetShootPower(shooter, driverOp::getLeftY);
 
-        
-
-        schedule(shootCommand);
-        register(shooter);
-    }
+    schedule(shootCommand);
+    register(shooter);
+  }
 }
