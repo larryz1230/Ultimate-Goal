@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
@@ -8,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TowerGoalDetector extends OpenCvPipeline {
-    Scalar redLowHSV = new Scalar(0, 72, 170); //Hue, Saturation, Values
-    Scalar blueLowHSV = new Scalar(114, 45, 47); //Hue, Saturation, Values
-    Scalar redHighHSV = new Scalar(180, 255, 255);
-    Scalar blueHighHSV = new Scalar(143, 201, 144);
+    private final Scalar redLowHSV = new Scalar(0, 72, 170); //Hue, Saturation, Values
+    private final Scalar blueLowHSV = new Scalar(114, 45, 47); //Hue, Saturation, Values
+    private final Scalar redHighHSV = new Scalar(180, 255, 255);
+    private final Scalar blueHighHSV = new Scalar(143, 201, 144);
+    private final int cameraDX = 1280;
+    private final int cameraDY = 720;
+    private Telemetry DashboardTele;
 
     Mat threshHoldedBlue = new Mat();
     Mat threshHoldedRed = new Mat();
@@ -26,6 +30,10 @@ public class TowerGoalDetector extends OpenCvPipeline {
         Imgproc.blur(input, output, new Size(9, 9));
         Imgproc.cvtColor(output, output, Imgproc.COLOR_BGR2HSV);
         Core.inRange(output, blueLowHSV, blueHighHSV, threshHoldedBlue);
+    }
+
+    public TowerGoalDetector(Telemetry DashboardTele) {
+        this.DashboardTele = DashboardTele;
     }
 
     @Override
@@ -49,7 +57,8 @@ public class TowerGoalDetector extends OpenCvPipeline {
         Rect slice = getSlice(threshHoldedRed, input, big_rect);
         ThreshHoldingBlue(input, threshHoldedBlue);
         Rect[] rect_arr_blue = getBoundingRect(threshHoldedBlue, input, slice);
-        getCenter(input, rect_arr_blue);
+        Point p = getCenter(input, rect_arr_blue);
+        getAngleFromCenter(p, input);
 
         return input;
     }
@@ -132,5 +141,17 @@ public class TowerGoalDetector extends OpenCvPipeline {
         Imgproc.circle(output, center, 4, new Scalar(0, 0, 255));
         return new Point((boundRect.tl().x + boundRect.br().x) * 0.5, (boundRect.tl().y + boundRect.br().y) * 0.5);
     }
-}
 
+    private boolean getAngleFromCenter(Point center, Mat input){
+        Point cetnerOfCamera = new Point((double) input.cols()/2, (double) input.rows()/2);
+        int threshholdX = 10;
+        int threshholdY = 10;
+        if(center.x <= cetnerOfCamera.x+threshholdX && center.x >= cetnerOfCamera.x-threshholdX){
+            Imgproc.circle(input, center, 4, new Scalar(0, 255, 0));
+            return true;
+        }else{
+            Imgproc.circle(input, center, 4, new Scalar(0, 0, 255));
+            return false;
+        }
+    }
+}

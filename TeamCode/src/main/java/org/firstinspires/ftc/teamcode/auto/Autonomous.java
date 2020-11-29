@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.vision.TowerGoalDetector;
 import org.firstinspires.ftc.teamcode.vision.StackDetector;
@@ -115,19 +117,27 @@ public abstract class Autonomous extends LinearOpMode {
         webcam.openCameraDevice();
         webcam.setPipeline(pipeline); // Adding detector to camera stream
         webcam.openCameraDeviceAsync(
-                () -> webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
+                () -> webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
         );
 
-        waitForStart();
-        webcam.stopStreaming();
+        FtcDashboard.getInstance().startCameraStream(webcam, 0);
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         initHardware();
-        StackDetector stackDetector = new StackDetector();
+
+        StackDetector stackDetector = new StackDetector(dashboardTelemetry);
         useVision(stackDetector);
-        TowerGoalDetector towerDetector = new TowerGoalDetector();
-        useVision(towerDetector);
+
+        waitForStart();
+
+        while(opModeIsActive()){
+            TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
+            useVision(towerDetector);
+        }
+        webcam.stopStreaming();
     }
 }
