@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+@Config
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Test Vision / bad PID")
 public abstract class Autonomous extends LinearOpMode {
 
@@ -120,7 +122,7 @@ public abstract class Autonomous extends LinearOpMode {
                 () -> webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
         );
 
-        FtcDashboard.getInstance().startCameraStream(webcam, 0);
+        FtcDashboard.getInstance().startCameraStream(webcam, 10);
     }
 
     @Override
@@ -131,13 +133,21 @@ public abstract class Autonomous extends LinearOpMode {
 
         StackDetector stackDetector = new StackDetector(dashboardTelemetry);
         useVision(stackDetector);
+//        TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
+//        useVision(towerDetector);
 
         waitForStart();
 
         while(opModeIsActive()){
-            TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
-            useVision(towerDetector);
+            dashboardTelemetry.addData("Frame Count", webcam.getFrameCount());
+            dashboardTelemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
+            dashboardTelemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
+            dashboardTelemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
+            dashboardTelemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
+            dashboardTelemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+            dashboardTelemetry.update();
         }
+        FtcDashboard.getInstance().stopCameraStream();
         webcam.stopStreaming();
     }
 }

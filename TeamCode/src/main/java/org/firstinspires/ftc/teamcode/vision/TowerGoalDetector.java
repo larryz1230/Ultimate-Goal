@@ -146,7 +146,7 @@ public class TowerGoalDetector extends OpenCvPipeline {
         Point cetnerOfCamera = new Point((double) input.cols()/2, (double) input.rows()/2);
         int threshholdX = 10;
         int threshholdY = 10;
-        if(center.x <= cetnerOfCamera.x+threshholdX && center.x >= cetnerOfCamera.x-threshholdX){
+        if(center.y <= cetnerOfCamera.y+threshholdY && center.y >= cetnerOfCamera.y-threshholdY){
             Imgproc.circle(input, center, 4, new Scalar(0, 255, 0));
             return true;
         }else{
