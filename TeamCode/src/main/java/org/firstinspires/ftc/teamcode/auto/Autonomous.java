@@ -133,12 +133,19 @@ public abstract class Autonomous extends LinearOpMode {
 
         StackDetector stackDetector = new StackDetector(dashboardTelemetry);
         useVision(stackDetector);
+//        TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
+//        useVision(towerDetector);
 
         waitForStart();
 
         while(opModeIsActive()){
-            TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
-            useVision(towerDetector);
+            dashboardTelemetry.addData("Frame Count", webcam.getFrameCount());
+            dashboardTelemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
+            dashboardTelemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
+            dashboardTelemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
+            dashboardTelemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
+            dashboardTelemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+            dashboardTelemetry.update();
         }
         FtcDashboard.getInstance().stopCameraStream();
         webcam.stopStreaming();
