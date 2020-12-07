@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.NewBevelShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.NewMotorSubsystem;
 
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Motor Velocity PID")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Motor Velocity PID")
 public class NewShooterTest extends CommandOpMode {
     private NewBevelShooterSubsystem shooter;
     private NewSetShootPower shootCommand;
