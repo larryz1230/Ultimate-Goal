@@ -9,9 +9,9 @@ public class BevelShooterSubsystem extends SubsystemBase {
     private final MotorSubsystem m_motor;
     private final MotorSubsystem m_reverse_motor;
 
-    public BevelShooterSubsystem(HardwareMap hm, MotorEx m_motor, MotorEx m_reverse_motor) {
-        this.m_motor = new MotorSubsystem(hm, m_motor, "velo");
-        this.m_reverse_motor = new MotorSubsystem(hm, m_reverse_motor, "velo");
+    public BevelShooterSubsystem(HardwareMap hm, MotorSubsystem m_motor, MotorSubsystem m_reverse_motor) {
+        this.m_motor = m_motor;
+        this.m_reverse_motor = m_reverse_motor;
     }
 
     public void set(double p){

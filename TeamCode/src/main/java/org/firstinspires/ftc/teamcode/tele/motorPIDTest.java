@@ -11,38 +11,38 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.SetShootPower;
 import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.MotorSubsystem;
 
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Motor Velocity PID")
 public class motorPIDTest extends CommandOpMode {
   private BevelShooterSubsystem shooter;
   private SetShootPower shootCommand;
-  private double currentVelocity;
-  private double maximumVelocity = 0.0;
+  static double kP = 0;
+  static double kI = 0;
+  static double kD = 0;
+  static double kS = 0;
+  static double kV = 0;
+
 
   @Override
   public void initialize() {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    MotorEx m_motor = new MotorEx(hardwareMap, "motor");
-    MotorEx m_reverse_motor = new MotorEx(hardwareMap, "inverted");
+    MotorSubsystem m_motor = new MotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "motor"), "velo");
+    MotorSubsystem m_reverse_motor = new MotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "inverted"), "velo");
     shooter = new BevelShooterSubsystem(hardwareMap, m_motor, m_reverse_motor);
 
-    GamepadEx driverOp = new GamepadEx(gamepad1);
-    GamepadButton flywheelShoot = new GamepadButton(driverOp, GamepadKeys.Button.A);
-    ButtonReader reader = new ButtonReader(driverOp, GamepadKeys.Button.A);
+    m_motor.setVelo(kP, kI, kD);
+    m_motor.setFF(kS, kV);
+    m_reverse_motor.setVelo(kP, kI, kD);
+    m_reverse_motor.setFF(kS, kV);
+    
+    m_motor.set(0.5);
+    m_reverse_motor.set(0.5);
 
-    if(reader.isDown()){
-      shootCommand = new SetShootPower(shooter, 1);
-      currentVelocity = shooter.getCurrentVelocityMotor();
-    }
-
-    if(currentVelocity > maximumVelocity){
-      maximumVelocity = currentVelocity;
-    }
-
-    dashboardTelemetry.addData("current velocity", currentVelocity);
-    dashboardTelemetry.addData("maximum velocity", maximumVelocity);
+    dashboardTelemetry.addData("current velocity Motor:", m_motor::getCurrentVelocity);
+    dashboardTelemetry.addData("current velocity Inverse: ", m_reverse_motor::getCurrentVelocity);
 
     schedule(shootCommand);
     register(shooter);
