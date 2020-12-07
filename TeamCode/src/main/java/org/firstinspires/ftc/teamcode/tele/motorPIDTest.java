@@ -12,11 +12,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.SetShootPower;
 import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
 
-import java.time.Instant;
-
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Maximum Velocity Measurement")
-public class testMotor extends CommandOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Motor Velocity PID")
+public class motorPIDTest extends CommandOpMode {
   private BevelShooterSubsystem shooter;
   private SetShootPower shootCommand;
   private double currentVelocity;
@@ -26,7 +24,9 @@ public class testMotor extends CommandOpMode {
   public void initialize() {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    shooter = new BevelShooterSubsystem(new MotorEx(hardwareMap, "motor"), new MotorEx(hardwareMap, "inverted"));
+    MotorEx m_motor = new MotorEx(hardwareMap, "motor");
+    MotorEx m_reverse_motor = new MotorEx(hardwareMap, "inverted");
+    shooter = new BevelShooterSubsystem(hardwareMap, m_motor, m_reverse_motor);
 
     GamepadEx driverOp = new GamepadEx(gamepad1);
     GamepadButton flywheelShoot = new GamepadButton(driverOp, GamepadKeys.Button.A);
@@ -34,7 +34,7 @@ public class testMotor extends CommandOpMode {
 
     if(reader.isDown()){
       shootCommand = new SetShootPower(shooter, 1);
-      currentVelocity = shooter.getCurrentVelocity();
+      currentVelocity = shooter.getCurrentVelocityMotor();
     }
 
     if(currentVelocity > maximumVelocity){

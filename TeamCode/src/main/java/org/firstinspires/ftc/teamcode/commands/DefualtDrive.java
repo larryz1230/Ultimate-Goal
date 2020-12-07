@@ -12,9 +12,6 @@ public class DefualtDrive extends CommandBase {
     private final DoubleSupplier m_vSpeed;
     private final DoubleSupplier m_tSpeed;
     private final DoubleSupplier m_gyroAngle;
-//    private final double m_hSpeed;
-//    private final double m_vSpeed;
-//    private final double m_gyroAngle;
 
     public DefualtDrive(DriveSubsystem subsystem, DoubleSupplier hSpeed, DoubleSupplier vSpeed, DoubleSupplier tSpeed, DoubleSupplier gyro) {
         this.m_drive = subsystem;
