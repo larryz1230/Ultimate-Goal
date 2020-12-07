@@ -10,7 +10,7 @@ import java.util.function.DoubleSupplier;
 
 public class SetShootPower extends CommandBase {
     private final BevelShooterSubsystem shooter;
-    private double speed;
+    private final double speed;
 
     public SetShootPower(BevelShooterSubsystem subsystem, DoubleSupplier speed) {
         this.shooter = subsystem;

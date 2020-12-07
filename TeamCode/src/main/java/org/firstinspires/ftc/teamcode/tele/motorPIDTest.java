@@ -14,35 +14,27 @@ import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MotorSubsystem;
 
 @Config
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Motor Velocity PID")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Motor Velocity PID")
 public class motorPIDTest extends CommandOpMode {
   private BevelShooterSubsystem shooter;
   private SetShootPower shootCommand;
-  static double kP = 0;
-  static double kI = 0;
-  static double kD = 0;
-  static double kS = 0;
-  static double kV = 0;
+  public static double kP = 0;
+  public static double kI = 0;
+  public static double kD = 0;
+  public static double kS = 0;
+  public static double kV = 0;
 
 
   @Override
   public void initialize() {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    MotorSubsystem m_motor = new MotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "motor"), "velo");
-    MotorSubsystem m_reverse_motor = new MotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "inverted"), "velo");
-    shooter = new BevelShooterSubsystem(hardwareMap, m_motor, m_reverse_motor);
+    shooter = new BevelShooterSubsystem(new MotorEx(hardwareMap, "motor"), new MotorEx(hardwareMap, "inverted"));
+    shooter.setVelo(kP, kI, kD);
+    shooter.setFF(kS, kV);
+    shootCommand = new SetShootPower(shooter, 0.5);
 
-    m_motor.setVelo(kP, kI, kD);
-    m_motor.setFF(kS, kV);
-    m_reverse_motor.setVelo(kP, kI, kD);
-    m_reverse_motor.setFF(kS, kV);
-    
-    m_motor.set(0.5);
-    m_reverse_motor.set(0.5);
-
-    dashboardTelemetry.addData("current velocity Motor:", m_motor::getCurrentVelocity);
-    dashboardTelemetry.addData("current velocity Inverse: ", m_reverse_motor::getCurrentVelocity);
+    dashboardTelemetry.addData("current velocity Motor:", shooter::getCurrentVelocity);
 
     schedule(shootCommand);
     register(shooter);
