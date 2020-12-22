@@ -36,7 +36,7 @@ public class DefualtDrive extends CommandBase {
         m_drive.drive(
                 this.m_hSpeed.getAsDouble(),
                 this.m_vSpeed.getAsDouble(),
-                this.m_tSpeed.getAsDouble(),
+                -this.m_tSpeed.getAsDouble(), // negative
                 this.m_gyroAngle.getAsDouble()
         );
     }

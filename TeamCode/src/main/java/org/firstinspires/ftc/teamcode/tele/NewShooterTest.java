@@ -17,11 +17,12 @@ public class NewShooterTest extends CommandOpMode {
     private NewSetShootPower shootCommand;
     private NewMotorSubsystem m_motor;
     private NewMotorSubsystem m_reverse_motor;
-    static double kP = 0.00;
+    static double kP = 30.00;
     static double kI = 0.00;
-    static double kD = 0.00;
-    static double kS = 0.00;
-    static double kV = 0.00;
+    static double kD = 7.00;
+    static double kS = 0.10;
+    static double kV = 0.0003;
+    static double power = 0.5;
 
     @Override
     public void initialize() {
@@ -37,7 +38,7 @@ public class NewShooterTest extends CommandOpMode {
         m_reverse_motor.setVelo(kP, kI, kD);
         m_reverse_motor.setFF(kS, kV);
 
-        shootCommand = new NewSetShootPower(shooter, 0.5);
+        shootCommand = new NewSetShootPower(shooter, power);
         dashboardTelemetry.addData("current velocity Motor:", m_motor::getCurrentVelocity);
         dashboardTelemetry.addData("current velocity Inverse: ", m_reverse_motor::getCurrentVelocity);
         dashboardTelemetry.update();
