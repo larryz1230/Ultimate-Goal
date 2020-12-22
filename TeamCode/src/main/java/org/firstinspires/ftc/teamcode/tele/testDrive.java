@@ -27,7 +27,7 @@ public class testDrive extends CommandOpMode {
         m_frontRight = new MotorEx(hardwareMap, "frontRight", Motor.GoBILDA.RPM_435);
         m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft", Motor.GoBILDA.RPM_435);
         m_bottomRight = new MotorEx(hardwareMap, "bottomRight", Motor.GoBILDA.RPM_435);
-        gyro = new RevIMU(hardwareMap, "gyro");
+        gyro = new RevIMU(hardwareMap, "imu");
         gyro.init();
         driveSubsys = new DriveSubsystem(
                 m_frontLeft,
@@ -42,7 +42,7 @@ public class testDrive extends CommandOpMode {
                 driveSubsys,
                 () -> driverController.getLeftX(),
                 () -> driverController.getLeftY(),
-                () -> driverController.getRightX(),
+                () -> -driverController.getRightX(),
                 () -> gyro.getHeading()
         );
 
