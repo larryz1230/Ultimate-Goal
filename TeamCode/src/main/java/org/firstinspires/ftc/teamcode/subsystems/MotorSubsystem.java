@@ -17,6 +17,4 @@ public class MotorSubsystem extends SubsystemBase {
     public void set(double p) {
         m_motor.set(p);
     }
-
-
 }

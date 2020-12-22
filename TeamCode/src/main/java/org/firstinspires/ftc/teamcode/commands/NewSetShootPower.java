@@ -3,22 +3,22 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.MotorSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.NewBevelShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
 
 
-public class SetShootPower extends CommandBase {
-    private final BevelShooterSubsystem shooter;
+public class NewSetShootPower extends CommandBase {
+    private final NewBevelShooterSubsystem shooter;
     private final double speed;
 
-    public SetShootPower(BevelShooterSubsystem subsystem, DoubleSupplier speed) {
+    public NewSetShootPower(NewBevelShooterSubsystem subsystem, DoubleSupplier speed) {
         this.shooter = subsystem;
         this.speed = speed.getAsDouble();
         addRequirements(shooter);
     }
 
-    public SetShootPower(BevelShooterSubsystem subsystem, double speed) {
+    public NewSetShootPower(NewBevelShooterSubsystem subsystem, double speed) {
         this.shooter = subsystem;
         this.speed = speed;
         addRequirements(shooter);
