@@ -6,10 +6,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-
-import org.firstinspires.ftc.teamcode.commands.DefualtDrive;
+import org.firstinspires.ftc.teamcode.commands.DefualtDriveComand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import com.qualcomm.ftcrobotcontroller.BuildConfig;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Test Drive")
@@ -19,7 +17,7 @@ public class testDrive extends CommandOpMode {
     private RevIMU gyro;
     private DriveSubsystem driveSubsys;
     private GamepadEx driverController;
-    private DefualtDrive driveCommand;
+    private DefualtDriveComand driveCommand;
 
     @Override
     public void initialize() {
@@ -38,7 +36,7 @@ public class testDrive extends CommandOpMode {
         );
 
         driverController = new GamepadEx(gamepad1);
-        driveCommand = new DefualtDrive(
+        driveCommand = new DefualtDriveComand(
                 driveSubsys,
                 () -> driverController.getLeftX(),
                 () -> driverController.getLeftY(),
