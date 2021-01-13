@@ -1,25 +1,20 @@
 package org.firstinspires.ftc.teamcode.tele;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-
-import org.firstinspires.ftc.teamcode.commands.DefualtDrive;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import com.qualcomm.ftcrobotcontroller.BuildConfig;
+import org.firstinspires.ftc.teamcode.commands.RobotCentricDriveComand;
+import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemRobotCentric;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Test Drive")
-public class testDrive extends CommandOpMode {
+public class testDriveRobotCentric extends CommandOpMode {
 
     private MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight;
-    private RevIMU gyro;
-    private DriveSubsystem driveSubsys;
+    private DriveSubsystemRobotCentric driveSubsys;
     private GamepadEx driverController;
-    private DefualtDrive driveCommand;
+    private RobotCentricDriveComand driveCommand;
 
     @Override
     public void initialize() {
@@ -27,23 +22,19 @@ public class testDrive extends CommandOpMode {
         m_frontRight = new MotorEx(hardwareMap, "frontRight", Motor.GoBILDA.RPM_435);
         m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft", Motor.GoBILDA.RPM_435);
         m_bottomRight = new MotorEx(hardwareMap, "bottomRight", Motor.GoBILDA.RPM_435);
-        gyro = new RevIMU(hardwareMap, "imu");
-        gyro.init();
-        driveSubsys = new DriveSubsystem(
+        driveSubsys = new DriveSubsystemRobotCentric(
                 m_frontLeft,
                 m_frontRight,
                 m_bottomLeft,
-                m_bottomRight,
-                gyro
+                m_bottomRight
         );
 
         driverController = new GamepadEx(gamepad1);
-        driveCommand = new DefualtDrive(
+        driveCommand = new RobotCentricDriveComand(
                 driveSubsys,
                 () -> driverController.getLeftX(),
                 () -> driverController.getLeftY(),
-                () -> -driverController.getRightX(),
-                () -> gyro.getHeading()
+                () -> -driverController.getRightX()
         );
 
 

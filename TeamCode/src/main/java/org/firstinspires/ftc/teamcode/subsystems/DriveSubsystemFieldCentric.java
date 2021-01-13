@@ -6,14 +6,14 @@ import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 
-public class DriveSubsystem extends SubsystemBase {
+public class DriveSubsystemFieldCentric extends SubsystemBase {
     private final MecanumDrive m_drive;
 
     private final MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight;
     private final GyroEx m_gyro;
 
 
-    public DriveSubsystem(MotorEx leftMotorTop, MotorEx rightMotorTop, MotorEx leftMotorBottom, MotorEx rightMotorBottom, GyroEx gyroEx) {
+    public DriveSubsystemFieldCentric(MotorEx leftMotorTop, MotorEx rightMotorTop, MotorEx leftMotorBottom, MotorEx rightMotorBottom, GyroEx gyroEx) {
         this.m_frontLeft = leftMotorTop;
         this.m_frontRight = rightMotorTop;
         this.m_bottomLeft = leftMotorBottom;
