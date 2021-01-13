@@ -8,7 +8,7 @@ import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import org.firstinspires.ftc.teamcode.commands.FieldCentricDriveComand;
-import org.firstinspires.ftc.teamcode.commands.NewSetShootPower;
+import org.firstinspires.ftc.teamcode.experimental.NewSetShootPower;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
 import org.firstinspires.ftc.teamcode.experimental.NewBevelShooterSubsystem;
 import org.firstinspires.ftc.teamcode.experimental.NewMotorSubsystem;

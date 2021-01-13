@@ -2,13 +2,9 @@ package org.firstinspires.ftc.teamcode.tele;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-
-import org.firstinspires.ftc.teamcode.commands.FieldCentricDriveComand;
 import org.firstinspires.ftc.teamcode.commands.RobotCentricDriveComand;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemRobotCentric;
 
 
