@@ -2,8 +2,7 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.NewBevelShooterSubsystem;
+import org.firstinspires.ftc.teamcode.experimental.NewBevelShooterSubsystem;
 
 import java.util.function.DoubleSupplier;
 

@@ -1,17 +1,18 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
 import java.util.function.DoubleSupplier;
 
-public class DefualtDriveComand extends CommandBase {
-    private final DriveSubsystem m_drive;
+public class FieldCentricDriveComand extends CommandBase {
+    private final DriveSubsystemFieldCentric m_drive;
     private final DoubleSupplier m_hSpeed;
     private final DoubleSupplier m_vSpeed;
     private final DoubleSupplier m_tSpeed;
     private final DoubleSupplier m_gyroAngle;
 
-    public DefualtDriveComand(DriveSubsystem subsystem, DoubleSupplier hSpeed, DoubleSupplier vSpeed, DoubleSupplier tSpeed, DoubleSupplier gyro) {
+    //Field Centric
+    public FieldCentricDriveComand(DriveSubsystemFieldCentric subsystem, DoubleSupplier hSpeed, DoubleSupplier vSpeed, DoubleSupplier tSpeed, DoubleSupplier gyro) {
         this.m_drive = subsystem;
         this.m_hSpeed = hSpeed;
         this.m_vSpeed = vSpeed;
@@ -19,15 +20,6 @@ public class DefualtDriveComand extends CommandBase {
         this.m_gyroAngle = gyro;
         addRequirements(this.m_drive);
     }
-
-
-//    public DefualtDriveComand(DriveSubsystem subsystem, DoubleSupplier hSpeed, DoubleSupplier vSpeed, DoubleSupplier tSpeed) {
-//        this.m_drive = subsystem;
-//        this.m_hSpeed = hSpeed;
-//        this.m_vSpeed = vSpeed;
-//        this.m_tSpeed = tSpeed;
-//        addRequirements(this.m_drive);
-//    }
 
     @Override
     public void execute() {
