@@ -24,12 +24,8 @@ public class ShooterTest extends CommandOpMode {
     private FieldCentricDriveComand driveCommand;
     private BevelShooterSubsystem shooter;
 
-    static double kP = 30.00;
-    static double kI = 0.00;
-    static double kD = 7.00;
-    static double kS = 0.10;
-    static double kV = 0.0003;
-    static double power = 0.5;
+
+    static double power = 1;
 
 
     @Override
@@ -47,8 +43,6 @@ public class ShooterTest extends CommandOpMode {
         gyro = new RevIMU(hardwareMap, "imu");
         gyro.init();
 
-        shooter.setVelo(kP, kI, kD);
-        shooter.setFF(kS, kV);
         telemetry.addData("m_shooter kP: ", m_shooterMotor.getVeloCoefficients()[0]);
         telemetry.update();
 
