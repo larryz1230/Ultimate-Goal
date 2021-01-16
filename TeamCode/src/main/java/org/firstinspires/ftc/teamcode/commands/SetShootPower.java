@@ -28,4 +28,9 @@ public class SetShootPower extends CommandBase {
     public void execute() {
        shooter.set(speed);
     }
+
+    @Override
+    public boolean isFinished(){
+        return true;
+    }
 }

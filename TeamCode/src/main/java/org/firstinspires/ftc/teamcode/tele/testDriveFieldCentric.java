@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.commands.FieldCentricDriveComand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Test Drive")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Field Centric Drive")
 public class testDriveFieldCentric extends CommandOpMode {
 
     private MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight;
