@@ -1,35 +1,28 @@
 package org.firstinspires.ftc.teamcode.tele;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.RevIMU;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.commands.FieldCentricDriveComand;
 import org.firstinspires.ftc.teamcode.commands.SetShootPower;
-import org.firstinspires.ftc.teamcode.experimental.NewSetShootPower;
+import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
-import org.firstinspires.ftc.teamcode.experimental.NewBevelShooterSubsystem;
-import org.firstinspires.ftc.teamcode.experimental.NewMotorSubsystem;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Shooter and Drive Test")
-public class NewShooterTest extends CommandOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "old Shooter and Drive Test")
+public class ShooterTest extends CommandOpMode {
 
-    private MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight;
+    private MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight, m_shooterMotor, m_reverse_shooterMotor, m_intake;
     private RevIMU gyro;
-    private GamepadEx driverController;
-
     private DriveSubsystemFieldCentric driveSubsys;
+    private GamepadEx driverController;
     private FieldCentricDriveComand driveCommand;
-
-    private NewBevelShooterSubsystem shooter;
-    private NewMotorSubsystem m_shooterMotor;
-    private NewMotorSubsystem m_reverse_shooterMotor;
-    private Button m_shooter_button;
+    private BevelShooterSubsystem shooter;
 
     static double kP = 30.00;
     static double kI = 0.00;
@@ -46,11 +39,19 @@ public class NewShooterTest extends CommandOpMode {
         m_bottomLeft = new MotorEx(hardwareMap, "bottomLeft", Motor.GoBILDA.RPM_435);
         m_bottomRight = new MotorEx(hardwareMap, "bottomRight", Motor.GoBILDA.RPM_435);
 
-        m_shooterMotor = new NewMotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "motor", Motor.GoBILDA.RPM_435), "velo");
-        m_reverse_shooterMotor = new NewMotorSubsystem(hardwareMap, new MotorEx(hardwareMap, "inverted", Motor.GoBILDA.RPM_435), "velo");
-        shooter = new NewBevelShooterSubsystem(m_shooterMotor, m_reverse_shooterMotor);
+        m_shooterMotor = new MotorEx(hardwareMap, "motor", Motor.GoBILDA.RPM_435);
+        m_reverse_shooterMotor = new MotorEx(hardwareMap, "inverted", Motor.GoBILDA.RPM_435);
+        m_intake = new MotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_435);
+        shooter = new BevelShooterSubsystem(m_shooterMotor, m_reverse_shooterMotor, m_intake);
 
         gyro = new RevIMU(hardwareMap, "imu");
+        gyro.init();
+
+        shooter.setVelo(kP, kI, kD);
+        shooter.setFF(kS, kV);
+        telemetry.addData("m_shooter kP: ", m_shooterMotor.getVeloCoefficients()[0]);
+        telemetry.update();
+
         driveSubsys = new DriveSubsystemFieldCentric(
                 m_frontLeft,
                 m_frontRight,
@@ -58,6 +59,12 @@ public class NewShooterTest extends CommandOpMode {
                 m_bottomRight,
                 gyro
         );
+
+        driverController = new GamepadEx(gamepad1);
+        GamepadButton buttonB = new GamepadButton(
+                driverController, GamepadKeys.Button.B
+        );
+
         driveCommand = new FieldCentricDriveComand(
                 driveSubsys,
                 () -> driverController.getLeftX(),
@@ -66,20 +73,11 @@ public class NewShooterTest extends CommandOpMode {
                 () -> gyro.getHeading()
         );
 
-        driverController = new GamepadEx(gamepad1);
-        GamepadButton buttonA = new GamepadButton(
-                driverController, GamepadKeys.Button.A
-        );
-        gyro.init();
-        m_shooterMotor.setVelo(kP, kI, kD);
-        m_shooterMotor.setFF(kS, kV);
-        m_reverse_shooterMotor.setVelo(kP, kI, kD);
-        m_reverse_shooterMotor.setFF(kS, kV);
+        buttonB.whenPressed(new SetShootPower(shooter, power))
+               .whenReleased(new SetShootPower(shooter, 0));
 
-        buttonA.whenPressed(new NewSetShootPower(shooter, power))
-                .whenReleased(new NewSetShootPower(shooter, 0));
         schedule(driveCommand);
-        register(driveSubsys, shooter, m_reverse_shooterMotor, m_shooterMotor);
+        register(driveSubsys, shooter);
     }
 }
 

@@ -8,18 +8,29 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class BevelShooterSubsystem extends SubsystemBase {
     private final MotorEx m_motor;
     private final MotorEx m_reverse_motor;
+    private final MotorEx m_intake;
 
-    public BevelShooterSubsystem(MotorEx m_motor, MotorEx m_reverse_motor) {
+    public BevelShooterSubsystem(MotorEx m_motor, MotorEx m_reverse_motor, MotorEx m_intake) {
         this.m_motor = m_motor;
         this.m_reverse_motor = m_reverse_motor;
-        m_motor.setRunMode(Motor.RunMode.VelocityControl);
-        m_reverse_motor.setRunMode(Motor.RunMode.VelocityControl);
+        this.m_intake = m_intake;
+//        m_motor.setRunMode(Motor.RunMode.VelocityControl);
+//        m_reverse_motor.setRunMode(Motor.RunMode.VelocityControl);
+//        m_intake.setRunMode(Motor.RunMode.VelocityControl);
+        m_motor.setRunMode(Motor.RunMode.RawPower);
+        m_reverse_motor.setRunMode(Motor.RunMode.RawPower);
+        m_intake.setRunMode(Motor.RunMode.RawPower);
+        m_intake.setInverted(true);
     }
 
 
     public void set(double p) {
+//        this.m_motor.resetEncoder();
+//        this.m_reverse_motor.resetEncoder();
+//        this.m_intake.resetEncoder();
         this.m_motor.set(p);
         this.m_reverse_motor.set(p);
+        this.m_intake.set(p);
     }
 
     public void setVelo(double kP, double kI, double kD) {

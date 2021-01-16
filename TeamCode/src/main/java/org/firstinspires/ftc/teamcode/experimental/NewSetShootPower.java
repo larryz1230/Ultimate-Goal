@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.experimental;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
 import org.firstinspires.ftc.teamcode.experimental.NewBevelShooterSubsystem;
 
@@ -11,12 +13,6 @@ public class NewSetShootPower extends CommandBase {
     private final NewBevelShooterSubsystem shooter;
     private final double speed;
 
-    public NewSetShootPower(NewBevelShooterSubsystem subsystem, DoubleSupplier speed) {
-        this.shooter = subsystem;
-        this.speed = speed.getAsDouble();
-        addRequirements(shooter);
-    }
-
     public NewSetShootPower(NewBevelShooterSubsystem subsystem, double speed) {
         this.shooter = subsystem;
         this.speed = speed;
@@ -25,6 +21,11 @@ public class NewSetShootPower extends CommandBase {
 
     @Override
     public void execute() {
-       shooter.set(speed);
+        shooter.set(speed);
+    }
+
+    @Override
+    public boolean isFinished(){
+        return true;
     }
 }
