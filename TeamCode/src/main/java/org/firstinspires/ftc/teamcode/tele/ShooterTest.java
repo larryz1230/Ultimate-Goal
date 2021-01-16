@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.commands.SetShootPower;
 import org.firstinspires.ftc.teamcode.subsystems.BevelShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystemFieldCentric;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "old Shooter and Drive Test")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Test this shooter!!! and also everything else")
 public class ShooterTest extends CommandOpMode {
 
     private MotorEx m_frontLeft, m_frontRight, m_bottomLeft, m_bottomRight, m_shooterMotor, m_reverse_shooterMotor, m_intake;
