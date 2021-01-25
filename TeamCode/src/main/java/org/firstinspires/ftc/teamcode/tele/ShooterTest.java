@@ -72,6 +72,7 @@ public class ShooterTest extends CommandOpMode {
         );
         buttonB.whileHeld(shootCommandGroup);
 
+
         register(driveSubsys, shooter);
         driveSubsys.setDefaultCommand(driveCommand);
     }

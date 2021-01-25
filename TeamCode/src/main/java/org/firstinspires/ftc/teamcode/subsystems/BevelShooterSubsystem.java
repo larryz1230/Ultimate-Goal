@@ -41,10 +41,18 @@ public class BevelShooterSubsystem extends SubsystemBase {
         m_reverse_motor.set(0.7);
     }
 
+    public void shootAt(double p) {
+        m_motor.set(p);
+        m_reverse_motor.set(p);
+    }
+
     public void runIntake(){
         m_intake.set(1);
     }
 
+    public void runIntake(double p){
+        m_intake.set(p);
+    }
     public void stop(){
         m_motor.stopMotor();
         m_reverse_motor.stopMotor();
