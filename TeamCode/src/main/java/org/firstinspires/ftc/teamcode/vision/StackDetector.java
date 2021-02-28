@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode.Auto.vision;
+package org.firstinspires.ftc.teamcode.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -8,53 +9,37 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+enum stack_pos {
+  NONE, ONE, FOUR,
+}
+
 public class StackDetector extends OpenCvPipeline {
-  public enum stack_pos
-  {
-    NONE, ONE, FOUR,
-  }
-
-  private stack_pos stackPos = stack_pos.NONE;
-
-  double pass = 0.25;
-
-
+  private final double pass = 0.25;
   private final Scalar defualt = new Scalar(50, 50, 50);
   private final Scalar one = new Scalar(255, 0, 0); // Red
   private final Scalar four = new Scalar(0, 255, 0); //Green
   private final Scalar zero = new Scalar(0, 0, 255); // Blue
-
-  //    Scalar lowHSV = new Scalar(21, 53, 31); //Hue, Saturation, Values
-//    Scalar highHSV = new Scalar(46, 96, 91);
-  Scalar lowHSV = new Scalar(10, 130, 85); //Hue, Saturation, Values
-  Scalar highHSV = new Scalar(180, 255, 255);
-
-//    private final Rect secondRect = new Rect(
-//            new Point(240, 225),
-//            new Point(320, 245)
-//    );
-//
-//    private final Rect firstRect = new Rect(
-//            new Point(240, 245),
-//            new Point(320, 275)
-//    );
-
+  private final Scalar lowHSV = new Scalar(10, 130, 85); //Hue, Saturation, Value
+  private final Scalar highHSV = new Scalar(180, 255, 255);
   private final Rect secondRect = new Rect(
           new Point(100, 200),
           new Point(180, 230)
   );
-
   private final Rect firstRect = new Rect(
           new Point(100, 230),
           new Point(180, 260)
   );
-
   Mat region1_Cb, region2_Cb;
   Mat threshHolded = new Mat();
+  Telemetry dashboardTele;
+
   double percentage_top, percentage_bottom;
+  private stack_pos stackPos = stack_pos.NONE;
 
-  private volatile stack_pos position = stack_pos.NONE;
 
+  public StackDetector(Telemetry dashboardTele){
+      this.dashboardTele = dashboardTele;
+  }
 
   void ThreshHolding(Mat input){
     Imgproc.cvtColor(input, threshHolded, Imgproc.COLOR_BGR2HSV);
@@ -95,21 +80,19 @@ public class StackDetector extends OpenCvPipeline {
       Imgproc.rectangle(input, firstRect, four, 1);
       Imgproc.rectangle(input, secondRect, four, 1);
     }else{
-      stackPos = stack_pos.NONE;
       Imgproc.rectangle(input, firstRect, zero, 1);
       Imgproc.rectangle(input, secondRect, zero, 1);
     }
-
-    System.out.println("Stack is: " + stackPos);
-    System.out.println("Percentage Top: " + round(percentage_top));
-    System.out.println("Percentage Bottom: " + round(percentage_bottom));
+    getInfo();
 
     return input;
   }
 
-  public stack_pos getAnalysis()
-  {
-    return position;
+  public void getInfo(){
+    dashboardTele.addData("Stack is: ", stackPos);
+    dashboardTele.addData("Percentage Top: ", round(percentage_top));
+    dashboardTele.addData("Percentage Bottom: ", round(percentage_bottom));
+    dashboardTele.update();
   }
 
   public static double round(double x){

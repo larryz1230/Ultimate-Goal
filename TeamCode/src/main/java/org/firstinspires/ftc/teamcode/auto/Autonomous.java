@@ -1,17 +1,21 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Auto.vision.TowerGoalDetector;
-import org.firstinspires.ftc.teamcode.Auto.vision.StackDetector;
-import org.opencv.core.Rect;
+import org.firstinspires.ftc.teamcode.vision.TowerGoalDetector;
+import org.firstinspires.ftc.teamcode.vision.StackDetector;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+@Config
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Test Vision / bad PID")
 public abstract class Autonomous extends LinearOpMode {
 
@@ -104,7 +108,7 @@ public abstract class Autonomous extends LinearOpMode {
         rearEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void donut_detector(){
+    public void useVision(OpenCvPipeline pipeline){
         int cameraMonitorViewId = hardwareMap
                 .appContext
                 .getResources()
@@ -113,34 +117,37 @@ public abstract class Autonomous extends LinearOpMode {
                 .getInstance()
                 .createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         webcam.openCameraDevice();
-        StackDetector detector = new StackDetector(telemetry);
-        webcam.setPipeline(detector); // Adding detector to camera stream
+        webcam.setPipeline(pipeline); // Adding detector to camera stream
         webcam.openCameraDeviceAsync(
-                () -> webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
+                () -> webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT) //These numbers are not real, find out real ones
         );
 
-        waitForStart();
-        webcam.stopStreaming();
+        FtcDashboard.getInstance().startCameraStream(webcam, 10);
     }
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //Call the thread for calculating odom
-        //move motors here
-        //comment
-        donut_detector();
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         initHardware();
-        double motorPower = 0;
+
+        StackDetector stackDetector = new StackDetector(dashboardTelemetry);
+        useVision(stackDetector);
+//        TowerGoalDetector towerDetector = new TowerGoalDetector(dashboardTelemetry);
+//        useVision(towerDetector);
+
+        waitForStart();
+
+        while(opModeIsActive()){
+            dashboardTelemetry.addData("Frame Count", webcam.getFrameCount());
+            dashboardTelemetry.addData("FPS", String.format("%.2f", webcam.getFps()));
+            dashboardTelemetry.addData("Total frame time ms", webcam.getTotalFrameTimeMs());
+            dashboardTelemetry.addData("Pipeline time ms", webcam.getPipelineTimeMs());
+            dashboardTelemetry.addData("Overhead time ms", webcam.getOverheadTimeMs());
+            dashboardTelemetry.addData("Theoretical max FPS", webcam.getCurrentPipelineMaxFps());
+            dashboardTelemetry.update();
+        }
+        FtcDashboard.getInstance().stopCameraStream();
+        webcam.stopStreaming();
     }
-
-    public void findAngle(OpenCvWebcam cam){
-        TowerGoalDetector pcd = new TowerGoalDetector(telemetry);
-        webcam.setPipeline(pcd);
-        Rect tower_goal = pcd.goal_coor(pcd.sortRects(pcd.returnBoundRect()));
-        telemetry.addData("X: ", tower_goal.x);
-        telemetry.addData("Y: ", tower_goal.y);
-        telemetry.update();
-
-    }
-
 }
